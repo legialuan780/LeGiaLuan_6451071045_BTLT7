@@ -72,7 +72,7 @@ class _CreatePostViewState extends State<CreatePostView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tạo bài viết'),
+        title: const Text('Tạo bài viết 6451071045'),
         centerTitle: true,
       ),
       body: SingleChildScrollView(

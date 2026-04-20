@@ -8,6 +8,9 @@ class ApiService {
       Uri.parse(AppConstants.taskUrl),
     );
 
+    print('GET status: ${response.statusCode}');
+    print('GET body: ${response.body.substring(0, 100)}');
+
     if (response.statusCode == 200) {
       return jsonDecode(response.body) as List<dynamic>;
     } else {
@@ -19,6 +22,8 @@ class ApiService {
     final response = await http.delete(
       Uri.parse('${AppConstants.taskUrl}/$id'),
     );
+
+    print('DELETE status: ${response.statusCode}');
 
     if (response.statusCode != 200) {
       throw Exception('Xóa task thất bại');

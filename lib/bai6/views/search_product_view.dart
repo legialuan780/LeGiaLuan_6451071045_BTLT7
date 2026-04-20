@@ -60,7 +60,7 @@ class _SearchProductViewState extends State<SearchProductView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tìm kiếm sản phẩm'),
+        title: const Text('Tìm kiếm sản phẩm 6451071045'),
         centerTitle: true,
       ),
       body: Padding(

@@ -70,7 +70,7 @@ class _NewsListViewState extends State<NewsListView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tin tức'),
+        title: const Text('Tin tức 6451071045'),
         centerTitle: true,
       ),
       body: _isLoading

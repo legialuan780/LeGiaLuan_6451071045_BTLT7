@@ -1,7 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import '../common/widget/task_item.dart';
-import '../controllers/task_controller.dart';
-import '../data/models/task_model.dart';
+import 'package:http/http.dart' as http;
 
 class TaskListView extends StatefulWidget {
   const TaskListView({super.key});
@@ -11,56 +10,54 @@ class TaskListView extends StatefulWidget {
 }
 
 class _TaskListViewState extends State<TaskListView> {
-  final TaskController _controller = TaskController();
-
-  bool _isLoading = true;
-  List<TaskModel> _tasks = [];
+  List<dynamic> tasks = [];
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadTasks();
+    loadTasks();
   }
 
-  Future<void> _loadTasks() async {
+  Future<void> loadTasks() async {
     try {
-      final tasks = await _controller.getTasks();
+      final response = await http.get(
+        Uri.parse('https://jsonplaceholder.typicode.com/todos'),
+      );
+
+      final data = jsonDecode(response.body);
 
       setState(() {
-        _tasks = tasks.take(10).toList();
-        _isLoading = false;
+        tasks = data.take(10).toList();
+        isLoading = false;
       });
     } catch (e) {
       setState(() {
-        _isLoading = false;
+        isLoading = false;
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Lỗi tải task: $e'),
-        ),
+        SnackBar(content: Text('Lỗi: $e')),
       );
     }
   }
 
-  Future<void> _deleteTask(TaskModel task) async {
+  Future<void> deleteTask(int id) async {
     try {
-      await _controller.deleteTask(task.id);
+      await http.delete(
+        Uri.parse('https://jsonplaceholder.typicode.com/todos/$id'),
+      );
 
       setState(() {
-        _tasks.removeWhere((item) => item.id == task.id);
+        tasks.removeWhere((task) => task['id'] == id);
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Đã xóa task: ${task.title}'),
-        ),
+        const SnackBar(content: Text('Đã xóa task')),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Lỗi xóa task: $e'),
-        ),
+        SnackBar(content: Text('Lỗi xóa: $e')),
       );
     }
   }
@@ -69,25 +66,24 @@ class _TaskListViewState extends State<TaskListView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Danh sách Task'),
-        centerTitle: true,
+        title: const Text('Danh sách Task 6451071045'),
       ),
-      body: _isLoading
-          ? const Center(
-        child: CircularProgressIndicator(),
-      )
-          : _tasks.isEmpty
-          ? const Center(
-        child: Text('Không còn task nào'),
-      )
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
-        itemCount: _tasks.length,
+        itemCount: tasks.length,
         itemBuilder: (context, index) {
-          final task = _tasks[index];
+          final task = tasks[index];
 
-          return TaskItem(
-            task: task,
-            onDelete: () => _deleteTask(task),
+          return ListTile(
+            title: Text(task['title']),
+            subtitle: Text(
+              task['completed'] ? 'Đã hoàn thành' : 'Chưa hoàn thành',
+            ),
+            trailing: IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () => deleteTask(task['id']),
+            ),
           );
         },
       ),
